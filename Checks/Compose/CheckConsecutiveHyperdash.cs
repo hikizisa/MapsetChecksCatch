@@ -27,19 +27,13 @@ namespace MapsetChecksCatch.Checks.Compose
             Documentation = new Dictionary<string, string>
             {
                 {
-                    "Note",
-                    "So far only checks consecutive hyperdashes and highersnapped hyperdashes followed by a different snap hyperdash."
-                },
-                {
                     "Purpose",
                     @"
                     <b>Rain</b> : 
                     Basic hyperdashes must not be used more than four times between consecutive fruits. 
-                    If higher-snapped hyperdashes are used, they must not be used in conjunction with other hyperdashes or higher-snapped dashes.
                     <br/>
                     <b>Platter</b> : 
-                    Basic hyperdashes must not be used more than two times between consecutive fruits. 
-                    If higher-snapped hyperdashes are used, they must be used singularly (not in conjunction with other hyperdashes or dashes)."
+                    Basic hyperdashes must not be used more than two times between consecutive fruits."
                 },
                 {
                     "Reasoning",
@@ -60,13 +54,6 @@ namespace MapsetChecksCatch.Checks.Compose
                             "timestamp - ", "rule amount", "amount")
                         .WithCause(
                             "Too many consecutive hyperdash are used.")
-                },
-                { "ConsecutiveHigherSnap",
-                    new IssueTemplate(Issue.Level.Problem,
-                            "{0} Highersnapped hyperdash followed by a different snapped hyperdash.",
-                            "timestamp - ")
-                        .WithCause(
-                            "Higher snapped hyperdash followed by a different snapped hyperdash.")
                 }
             };
         }
@@ -102,51 +89,9 @@ namespace MapsetChecksCatch.Checks.Compose
 
             var count = 0;
             CatchHitObject lastObject = null;
-            var nextMustBeSameSnap = false;
             var issues = new List<Issue>();
             foreach (var currentObject in catchObjects)
             {
-                if (nextMustBeSameSnap && lastObject != null)
-                {
-                    if (lastObject.NoteType == NoteType.CIRCLE || lastObject.NoteType == NoteType.TAIL)
-                    {
-                        var lastObjectMsGap = (int) (lastObject.time - lastObject.Origin.time);
-                        var currentMsGap = (int) (currentObject.time - lastObject.time);
-
-                        if (lastObjectMsGap == 0 || currentMsGap == 0) continue;
-
-                        // add + 5 or - 5 to reduce false positives for ~1 ms wrongly snapped objects
-                        if ((lastObjectMsGap > currentMsGap + 5 || lastObjectMsGap < currentMsGap - 5) 
-                            && lastObject.MovementType == MovementType.HYPERDASH && currentObject.MovementType == MovementType.HYPERDASH)
-                        {
-                            yield return new Issue(
-                                GetTemplate("ConsecutiveHigherSnap"),
-                                beatmap,
-                                Timestamp.Get(currentObject.time)
-                            ).ForDifficulties(Beatmap.Difficulty.Hard);
-
-                            yield return new Issue(
-                                GetTemplate("ConsecutiveHigherSnap"),
-                                beatmap,
-                                Timestamp.Get(currentObject.time)
-                            ).ForDifficulties(Beatmap.Difficulty.Insane);
-                        }
-                    }
-
-                    nextMustBeSameSnap = false;
-                }
-
-                // Check if we came from a hyperdash
-                if (lastObject != null)
-                {
-                    // Check if it was highersnapped for platter/rain rule
-                    if (IsHigherSnapped(Beatmap.Difficulty.Hard, currentObject, lastObject)
-                        || IsHigherSnapped(Beatmap.Difficulty.Insane, currentObject, lastObject))
-                    {
-                        nextMustBeSameSnap = true;
-                    }
-                }
-
                 if (currentObject.MovementType == MovementType.HYPERDASH)
                 {
                     count++;
@@ -155,7 +100,6 @@ namespace MapsetChecksCatch.Checks.Compose
                 else
                 {
                     issues.AddRange(GetConsecutiveHyperdashIssues(beatmap, count, lastObject));
-                    lastObject = null;
                     count = 0;
                 }
 
@@ -169,10 +113,14 @@ namespace MapsetChecksCatch.Checks.Compose
                     else
                     {
                         issues.AddRange(GetConsecutiveHyperdashIssues(beatmap, count, lastObject));
-                        lastObject = null;
                         count = 0;
                     }
                 }
+            }
+
+            foreach(var issue in issues)
+            {
+                yield return issue;
             }
         }
 

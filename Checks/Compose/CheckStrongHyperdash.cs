@@ -117,7 +117,7 @@ namespace MapsetChecksCatch.Checks.Compose
                 lastCheckedObject = currentObject;
 
                 // If current object is a slider, update lastCheckedObject to sliderend
-                // Sliderbody hyperdash is not allowed, so it should be checked in separate module
+                // Sliderbody hyperdash is not allowed in platter, so it should be checked in separate module
                 foreach (var currentObjectExtra in currentObject.Extras)
                 {
                     lastCheckedObject = currentObjectExtra;
