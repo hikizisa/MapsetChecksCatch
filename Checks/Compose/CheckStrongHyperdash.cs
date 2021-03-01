@@ -63,36 +63,6 @@ namespace MapsetChecksCatch.Checks.Compose
             };
         }
 
-        public IEnumerable<Issue> GetStrongHyperdashIssues(Beatmap beatmap, CatchHitObject currentObject CatchHitObject lastCheckedObject)
-        {
-            var snap = (int)(currentObject.time - lastCheckedObject.time);
-            var distance = (int)(Math.Abs(lastCheckedObject.X - currentObject.X));
-            var hyperDistance = distance + lastCheckedObject.DistanceToHyperDash;
-            var multiplier = (float)distance / (float)hyperDistance;
-
-            if (snap < 250 && snap >= 125 && multiplier > ThresholdPlatterHigherHyper)
-            {
-                yield return new Issue(
-                    GetTemplate("StrongHigherSnap"),
-                    beatmap,
-                    Timestamp.Get(currentObject.time),
-                    ThresholdPlatterHigherHyper,
-                    multiplier
-                ).ForDifficulties(Beatmap.Difficulty.Hard);
-            }
-
-            if (snap >= 250 && multiplier > ThresholdPlatterHyper)
-            {
-                yield return new Issue(
-                    GetTemplate("Strong"),
-                    beatmap,
-                    Timestamp.Get(currentObject.time),
-                    ThresholdPlatterHyper,
-                    multiplier
-                ).ForDifficulties(Beatmap.Difficulty.Hard);
-            }
-        }
-
         public override IEnumerable<Issue> GetIssues(Beatmap beatmap)
         {
             CheckBeatmapSetDistanceCalculation.SetBeatmaps.TryGetValue(beatmap.metadataSettings.version, out var catchObjects);
@@ -116,20 +86,41 @@ namespace MapsetChecksCatch.Checks.Compose
 
                 if (lastCheckedObject.MovementType == MovementType.HYPERDASH)
                 {
-                    issues.AddRange(GetStrongHyperdashIssues(beatmap, currentObject, lastCheckedObject);
+                    var snap = (int)(currentObject.time - lastCheckedObject.time);
+                    var distance = (int)(Math.Abs(lastCheckedObject.X - currentObject.X));
+                    var hyperDistance = distance + lastCheckedObject.DistanceToHyperDash;
+                    var multiplier = (float)distance / (float)hyperDistance;
+
+                    if (snap < 250 && snap >= 125 && multiplier > ThresholdPlatterHigherHyper)
+                    {
+                        yield return new Issue(
+                            GetTemplate("StrongHigherSnap"),
+                            beatmap,
+                            Timestamp.Get(currentObject.time),
+                            ThresholdPlatterHigherHyper,
+                            multiplier
+                        ).ForDifficulties(Beatmap.Difficulty.Hard);
+                    }
+
+                    if (snap >= 250 && multiplier > ThresholdPlatterHyper)
+                    {
+                        yield return new Issue(
+                            GetTemplate("Strong"),
+                            beatmap,
+                            Timestamp.Get(currentObject.time),
+                            ThresholdPlatterHyper,
+                            multiplier
+                        ).ForDifficulties(Beatmap.Difficulty.Hard);
+                    }
                 }
 
                 lastCheckedObject = currentObject;
 
-                //Check snaps for slider parts
-                foreach (var sliderObjectExtra in currentObject.Extras)
+                // If current object is a slider, update lastCheckedObject to sliderend
+                // Sliderbody hyperdash is not allowed, so it should be checked in separate module
+                foreach (var currentObjectExtra in currentObject.Extras)
                 {
-                    if (lastCheckedObject.MovementType == MovementType.HYPERDASH)
-                    {
-                        issues.AddRange(GetStrongHyperdashIssues(beatmap, sliderObjectExtra, lastCheckedObject);
-                    }
-
-                    lastCheckedObject = sliderObjectExtra;
+                    lastCheckedObject = currentObjectExtra;
                 }
             }
         }
