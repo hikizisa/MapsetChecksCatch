@@ -9,6 +9,7 @@ MapsetChecksCatch is like [MapsetChecks](https://github.com/Naxesss/MapsetChecks
  - Edge dashes
  - Consecutive hyperdashes
  - Consecutive highersnapped hyperdashes
+ - Strong hyperdashes
  - Hyperdash snap
 
 **Minor checks:**
