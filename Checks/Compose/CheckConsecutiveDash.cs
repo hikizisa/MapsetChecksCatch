@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MapsetChecksCatch.Checks.General;
 using MapsetChecksCatch.Helper;
@@ -11,35 +11,35 @@ using MapsetVerifierFramework.objects.metadata;
 namespace MapsetChecksCatch.Checks.Compose
 {
     [Check]
-    public class CheckConsecutiveHyperdash : BeatmapCheck
+    public class CheckConsecutiveDash : BeatmapCheck
     {
-        private const int ThresholdPlatter = 2;
-        private const int ThresholdRain = 4;
+        private const int ThresholdSalad = 2;
+        private const int ThresholdPlatter = 4;
 
         public override CheckMetadata GetMetadata() => new BeatmapCheckMetadata
         {
             Category = "Compose",
-            Message = "Too many consecutive hyperdashes.",
-            Difficulties = new[] { Beatmap.Difficulty.Hard, Beatmap.Difficulty.Insane },
+            Message = "Too many consecutive dashes.",
+            Difficulties = new[] { Beatmap.Difficulty.Normal, Beatmap.Difficulty.Hard },
             Modes = new[] { Beatmap.Mode.Catch },
-            Author = "Greaper",
+            Author = "Riana",
 
             Documentation = new Dictionary<string, string>
             {
                 {
                     "Purpose",
                     @"
-                    <b>Rain</b> : 
-                    Basic hyperdashes must not be used more than four times between consecutive fruits. 
-                    <br/>
                     <b>Platter</b> : 
-                    Basic hyperdashes must not be used more than two times between consecutive fruits."
+                    Basic dashes must not be used more than four times between consecutive fruits.
+                    <br/>
+                    <b>Salad</b> : 
+                    Basic dashes must not be used more than two times between consecutive fruits. "
                 },
                 {
                     "Reasoning",
                     @"
-                    The amount of hyperdashes used in a difficulty should be increasing which each difficulty level.
-                    In platters the maximum amount of hyperdashes is set to two because the difficulty is meant to be an introduction to hypers."
+                    The amount of dashes used in a difficulty should be increasing which each difficulty level.
+                    In salads the maximum amount of dashes is set to two because the difficulty is meant to be an introduction to dashes."
                 }
             }
         };
@@ -50,16 +50,27 @@ namespace MapsetChecksCatch.Checks.Compose
             {
                 { "Consecutive",
                     new IssueTemplate(Issue.Level.Problem,
-                            "{0} Too many consecutive hyperdashes were used and should be at most {1}, currently {2}.",
+                            "{0} Too many consecutive dashes were used and should be at most {1}, currently {2}.",
                             "timestamp - ", "rule amount", "amount")
                         .WithCause(
-                            "Too many consecutive hyperdash are used.")
+                            "Too many consecutive dashes are used.")
                 }
             };
         }
 
         public IEnumerable<Issue> GetConsecutiveHyperdashIssues(Beatmap beatmap, int count, CatchHitObject lastObject)
         {
+            if (count > ThresholdSalad)
+            {
+                yield return new Issue(
+                    GetTemplate("Consecutive"),
+                    beatmap,
+                    Timestamp.Get(lastObject.time),
+                    ThresholdSalad,
+                    count
+                ).ForDifficulties(Beatmap.Difficulty.Normal);
+            }
+
             if (count > ThresholdPlatter)
             {
                 yield return new Issue(
@@ -69,17 +80,6 @@ namespace MapsetChecksCatch.Checks.Compose
                     ThresholdPlatter,
                     count
                 ).ForDifficulties(Beatmap.Difficulty.Hard);
-            }
-
-            if (count > ThresholdRain)
-            {
-                yield return new Issue(
-                    GetTemplate("Consecutive"),
-                    beatmap,
-                    Timestamp.Get(lastObject.time),
-                    ThresholdRain,
-                    count
-                ).ForDifficulties(Beatmap.Difficulty.Insane);
             }
         }
 
@@ -92,7 +92,7 @@ namespace MapsetChecksCatch.Checks.Compose
             var issues = new List<Issue>();
             foreach (var currentObject in catchObjects)
             {
-                if (currentObject.MovementType == MovementType.HYPERDASH)
+                if (currentObject.MovementType == MovementType.DASH)
                 {
                     count++;
                     lastObject = currentObject;
@@ -105,7 +105,7 @@ namespace MapsetChecksCatch.Checks.Compose
 
                 foreach (var currentObjectExtra in currentObject.Extras)
                 {
-                    if (currentObjectExtra.MovementType == MovementType.HYPERDASH)
+                    if (currentObjectExtra.MovementType == MovementType.DASH)
                     {
                         count++;
                         lastObject = currentObject;
