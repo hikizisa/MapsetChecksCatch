@@ -48,14 +48,14 @@ namespace MapsetChecksCatch.Checks.Compose
             {
                 { "Strong",
                     new IssueTemplate(Issue.Level.Warning,
-                            "{0} Basic hyper should not be longer than {1} times the trigger distance, currently {2}.",
+                            "{0} Basic hyper should not be longer than {1} times the trigger distance, currently {2} times.",
                             "timestamp - ", "rule amount", "amount")
                         .WithCause(
                             "Too strong hyperdash is used.")
                 },
                 { "StrongHigherSnap",
                     new IssueTemplate(Issue.Level.Warning,
-                            "{0} Higher snapped hyper should not be longer than {1} times the trigger distance, currently {2}.",
+                            "{0} Higher snapped hyper should not be longer than {1} times the trigger distance, currently {2} times.",
                             "timestamp - ", "rule amount", "amount")
                         .WithCause(
                             "Too strong higher snapped hyperdash is used.")
