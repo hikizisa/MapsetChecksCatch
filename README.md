@@ -6,7 +6,10 @@ MapsetChecksCatch is like [MapsetChecks](https://github.com/Naxesss/MapsetChecks
 
 ## Available checks
 **Unrankable checks:**
+ - Dashes and hyperdashes in Cups/Salads
+ - Hyperdash of different snap usage on Platters
  - Edge dashes
+ - Consecutive dashes
  - Consecutive hyperdashes
  - Consecutive highersnapped hyperdashes
  - Strong hyperdashes
@@ -19,10 +22,7 @@ MapsetChecksCatch is like [MapsetChecks](https://github.com/Naxesss/MapsetChecks
  - Spinner present
 
 ## Planned checks
- - Hyperdashes in Cups/Salads
- - Dashes in Cups
  - Consecutive edge dash usage in Rains/Overdoses
- - Hyperdash of different snap usage on Platters
  - Unallowed dash snaps on Salad/Platter/Rain
  - Difficulty guideline settings
 
