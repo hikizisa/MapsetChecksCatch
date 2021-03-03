@@ -101,7 +101,7 @@ namespace MapsetChecksCatch.Checks.Compose
                     yield return EdgeWalkIssue(GetTemplate("EdgeWalk"), beatmap, issueObject,
                         Beatmap.Difficulty.Hard);
                     yield return EdgeWalkIssue(GetTemplate("EdgeWalkWarning"), beatmap, issueObject,
-                        Beatmap.Difficulty.Easy, Beatmap.Difficulty.Normal);
+                        Beatmap.Difficulty.Normal);
                 }
             }
         }

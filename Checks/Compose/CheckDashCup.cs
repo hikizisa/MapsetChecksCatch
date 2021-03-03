@@ -40,6 +40,12 @@ namespace MapsetChecksCatch.Checks.Compose
         {
             return new Dictionary<string, IssueTemplate>
             {
+                { "StrongWalk",
+                    new IssueTemplate(Issue.Level.Warning,
+                            "{0} Strong walk is used.",
+                            "timestamp - ")
+                        .WithCause("Strong walk can be difficult on difficulty level.")
+                },
                 { "Dash",
                     new IssueTemplate(Issue.Level.Problem,
                             "{0} Dash is used.",
@@ -65,7 +71,7 @@ namespace MapsetChecksCatch.Checks.Compose
             {
                 yield break;
             }
-            for (var i = 0; i < catchObjects.Count; i++)
+            for (var i = 0; i < catchObjects.Count - 1; i++)
             {
                 var currentObject = catchObjects[i];
 
@@ -77,14 +83,22 @@ namespace MapsetChecksCatch.Checks.Compose
                         Timestamp.Get(currentObject.time)
                     ).ForDifficulties(Beatmap.Difficulty.Easy);
                 }
-
-                if (currentObject.MovementType == MovementType.HYPERDASH)
+                else if (currentObject.MovementType == MovementType.HYPERDASH)
                 {
                     yield return new Issue(
                         GetTemplate("HyperDash"),
                         beatmap,
                         Timestamp.Get(currentObject.time)
                     ).ForDifficulties(Beatmap.Difficulty.Easy);
+                }
+                else {
+                    if (currentObject.DistanceToDash <= 0.15 * (currentObject.Target.time - currentObject.time)){
+                        yield return new Issue(
+                            GetTemplate("StrongWalk"),
+                            beatmap,
+                            Timestamp.Get(currentObject.time)
+                        ).ForDifficulties(Beatmap.Difficulty.Easy);
+                    }
                 }
 
                 //Check snaps for slider parts
@@ -98,14 +112,22 @@ namespace MapsetChecksCatch.Checks.Compose
                             Timestamp.Get(sliderObjectExtra.time)
                         ).ForDifficulties(Beatmap.Difficulty.Easy);
                     }
-
-                    if (sliderObjectExtra.MovementType == MovementType.HYPERDASH)
+                    else if (sliderObjectExtra.MovementType == MovementType.HYPERDASH)
                     {
                         yield return new Issue(
                             GetTemplate("HyperDash"),
                             beatmap,
                             Timestamp.Get(sliderObjectExtra.time)
                         ).ForDifficulties(Beatmap.Difficulty.Easy);
+                    }
+                    else {
+                        if (sliderObjectExtra.DistanceToDash <= 0.15 * (sliderObjectExtra.Target.time - sliderObjectExtra.time)){
+                            yield return new Issue(
+                                GetTemplate("StrongWalk"),
+                                beatmap,
+                                Timestamp.Get(sliderObjectExtra.time)
+                            ).ForDifficulties(Beatmap.Difficulty.Easy);
+                        }
                     }
                 }
             }
