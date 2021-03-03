@@ -96,7 +96,7 @@ namespace MapsetChecksCatch.Checks.Compose
                         yield return new Issue(
                             GetTemplate("StrongHigherSnap"),
                             beatmap,
-                            Timestamp.Get(currentObject.time),
+                            Timestamp.Get(lastCheckedObject.time),
                             ThresholdPlatterHigherHyper,
                             multiplier
                         ).ForDifficulties(Beatmap.Difficulty.Hard);
@@ -107,7 +107,7 @@ namespace MapsetChecksCatch.Checks.Compose
                         yield return new Issue(
                             GetTemplate("Strong"),
                             beatmap,
-                            Timestamp.Get(currentObject.time),
+                            Timestamp.Get(lastCheckedObject.time),
                             ThresholdPlatterHyper,
                             multiplier
                         ).ForDifficulties(Beatmap.Difficulty.Hard);

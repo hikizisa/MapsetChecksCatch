@@ -39,6 +39,13 @@ namespace MapsetChecksCatch.Checks.Compose
         {
             return new Dictionary<string, IssueTemplate>
             {
+                { "EdgeWalkWarning",
+                    new IssueTemplate(Issue.Level.Warning,
+                            "{0} This object is a harsh walk and might be seen as ambiguous, consider reducing it.",
+                            "timestamp - ")
+                        .WithCause(
+                            "A too strong walk is provided")
+                },
                 { "EdgeWalk",
                     new IssueTemplate(Issue.Level.Minor,
                             "{0} This object is a harsh walk and might be seen as ambiguous, consider reducing it.",
@@ -92,7 +99,9 @@ namespace MapsetChecksCatch.Checks.Compose
                 if (issueObject.DistanceToDash < 20)
                 {
                     yield return EdgeWalkIssue(GetTemplate("EdgeWalk"), beatmap, issueObject,
-                        Beatmap.Difficulty.Easy, Beatmap.Difficulty.Normal, Beatmap.Difficulty.Hard);
+                        Beatmap.Difficulty.Hard);
+                    yield return EdgeWalkIssue(GetTemplate("EdgeWalkWarning"), beatmap, issueObject,
+                        Beatmap.Difficulty.Easy, Beatmap.Difficulty.Normal);
                 }
             }
         }

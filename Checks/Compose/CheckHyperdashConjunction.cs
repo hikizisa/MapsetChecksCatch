@@ -71,6 +71,9 @@ namespace MapsetChecksCatch.Checks.Compose
             for (var i = 1; i < catchObjects.Count - 1; i++)
             {
                 var currentObject = catchObjects[i];
+                var markedHard = false;
+                var markedInsane = false;
+
                 if (lastObject.MovementType == MovementType.HYPERDASH && currentObject.MovementType != MovementType.WALK){
                     if (IsHigherSnapped(Beatmap.Difficulty.Hard, currentObject, lastObject)){
                         yield return new Issue(
@@ -78,6 +81,7 @@ namespace MapsetChecksCatch.Checks.Compose
                             beatmap,
                             Timestamp.Get(currentObject.time)
                         ).ForDifficulties(Beatmap.Difficulty.Hard);
+                        markedHard = true;
                     }
                     if (IsHigherSnapped(Beatmap.Difficulty.Insane, currentObject, lastObject) &&
                         (currentObject.MovementType == MovementType.HYPERDASH || IsHigherSnapped(Beatmap.Difficulty.Insane, currentObject.Target, currentObject))){
@@ -86,18 +90,19 @@ namespace MapsetChecksCatch.Checks.Compose
                             beatmap,
                             Timestamp.Get(currentObject.time)
                         ).ForDifficulties(Beatmap.Difficulty.Insane);
+                        markedInsane = true;
                     }
                 }
 
                 if (currentObject.MovementType == MovementType.HYPERDASH && lastObject.MovementType != MovementType.WALK){
-                    if (IsHigherSnapped(Beatmap.Difficulty.Insane, currentObject.Target, currentObject)){
+                    if (IsHigherSnapped(Beatmap.Difficulty.Insane, currentObject.Target, currentObject) && !markedHard){
                         yield return new Issue(
                             GetTemplate("ConsecutiveHigherSnapPlatter"),
                             beatmap,
                             Timestamp.Get(currentObject.time)
                         ).ForDifficulties(Beatmap.Difficulty.Hard);
                     }
-                    if (IsHigherSnapped(Beatmap.Difficulty.Insane, currentObject.Target, currentObject) &&
+                    if (IsHigherSnapped(Beatmap.Difficulty.Insane, currentObject.Target, currentObject) && !markedInsane &&
                         (lastObject.MovementType == MovementType.HYPERDASH || IsHigherSnapped(Beatmap.Difficulty.Insane, currentObject, lastObject))){
                         yield return new Issue(
                             GetTemplate("ConsecutiveHigherSnapRain"),
