@@ -118,7 +118,8 @@ namespace MapsetChecksCatch.Checks.Compose
 
                     var next_distance = currentObject.X - currentObject.Target.X;
                     // objects can be nearly stacked, give some leniency for those so they won't be considered antiflow
-                    var leniency = Math.Min((float)snap / 8.0, quarterCatcherWidth);
+                    var next_snap = (int)(currentObject.Target.time - currentObject.time);
+                    var leniency = Math.Max((float)next_snap / 4.0, quarterCatcherWidth);
 
                     // antiflow condition
                     if (distance * next_distance < 0 && Math.Abs(next_distance)> leniency) {
@@ -160,7 +161,6 @@ namespace MapsetChecksCatch.Checks.Compose
                                 }
                             }
                             else {
-                                var next_snap = (int)(currentObject.Target.time - currentObject.time);
                                 if (next_snap < 125 && next_snap >= 64){
                                     yield return new Issue(
                                         GetTemplate("AntiflowHighDash"),
