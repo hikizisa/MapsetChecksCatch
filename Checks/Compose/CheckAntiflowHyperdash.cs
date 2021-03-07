@@ -118,8 +118,8 @@ namespace MapsetChecksCatch.Checks.Compose
 
                     var next_distance = currentObject.X - currentObject.Target.X;
                     // objects can be nearly stacked, give some leniency for those so they won't be considered antiflow
-                    var next_snap = (int)(currentObject.Target.time - currentObject.time);
-                    var leniency = Math.Max((float)next_snap / 4.0, quarterCatcherWidth);
+                    var next_snap = (float)(currentObject.Target.time - currentObject.time);
+                    var leniency = Math.Max(Math.Min(125.0, next_snap) / 4.0 + Math.Max(0.0, next_snap - 125.0) / 2.0, quarterCatcherWidth);
 
                     // antiflow condition
                     if (distance * next_distance < 0 && Math.Abs(next_distance)> leniency) {
