@@ -71,10 +71,29 @@ namespace MapsetChecksCatch.Checks.Compose
             {
                 yield break;
             }
+
+            var issueObjects = new List<CatchHitObject>();
+
             for (var i = 0; i < catchObjects.Count - 1; i++)
             {
                 var currentObject = catchObjects[i];
 
+                if (currentObject.DistanceToDash <= 0.15 * (currentObject.Target.time - currentObject.time)){
+                    issueObjects.Add(currentObject);
+                }
+
+                if (currentObject.Extras == null) continue;
+
+                //Check snaps for slider parts
+                foreach (var sliderObjectExtra in currentObject.Extras)
+                {
+                    if (currentObject.DistanceToDash <= 0.15 * (currentObject.Target.time - currentObject.time)){
+                        issueObjects.Add(currentObject);
+                    }
+                }
+            }
+
+            foreach (var currentObject in issueObjects){
                 if (currentObject.MovementType == MovementType.DASH)
                 {
                     yield return new Issue(
@@ -100,37 +119,7 @@ namespace MapsetChecksCatch.Checks.Compose
                         ).ForDifficulties(Beatmap.Difficulty.Easy);
                     }
                 }
-
-                //Check snaps for slider parts
-                foreach (var sliderObjectExtra in currentObject.Extras)
-                {
-                    if (sliderObjectExtra.MovementType == MovementType.DASH)
-                    {
-                        yield return new Issue(
-                            GetTemplate("Dash"),
-                            beatmap,
-                            Timestamp.Get(sliderObjectExtra.time)
-                        ).ForDifficulties(Beatmap.Difficulty.Easy);
-                    }
-                    else if (sliderObjectExtra.MovementType == MovementType.HYPERDASH)
-                    {
-                        yield return new Issue(
-                            GetTemplate("HyperDash"),
-                            beatmap,
-                            Timestamp.Get(sliderObjectExtra.time)
-                        ).ForDifficulties(Beatmap.Difficulty.Easy);
-                    }
-                    else {
-                        if (sliderObjectExtra.DistanceToDash <= 0.15 * (sliderObjectExtra.Target.time - sliderObjectExtra.time)){
-                            yield return new Issue(
-                                GetTemplate("StrongWalk"),
-                                beatmap,
-                                Timestamp.Get(sliderObjectExtra.time)
-                            ).ForDifficulties(Beatmap.Difficulty.Easy);
-                        }
-                    }
-                }
-            }
+            }            
         }
     }
 }
