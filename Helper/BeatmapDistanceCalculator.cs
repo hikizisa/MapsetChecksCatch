@@ -151,6 +151,7 @@ namespace MapsetChecksCatch.Helper
                 var objectMetadata = GenerateObjectMetadata(currentObject, nextObject, lastDirection, dashRange, walkRange, halfCatcherWidth);
                 currentObject.Origin = currentObject;
                 currentObject.Target = nextObject;
+                currentObject.DistanceInOsuCords = objectMetadata.DistanceInOsuCords;
                 currentObject.DistanceToHyperDash = objectMetadata.DistanceToHyper;
                 currentObject.DistanceToDash = objectMetadata.DistanceToDash;
                 currentObject.MovementType = objectMetadata.MovementType;
@@ -194,7 +195,9 @@ namespace MapsetChecksCatch.Helper
             metadata.HyperDistanceToNext = metadata.DistanceInOsuCords - (lastDirection == metadata.Direction ? dashRange : halfCatcherWidth);
             metadata.DashDistanceToNext = metadata.DistanceInOsuCords - (lastDirection == metadata.Direction ? walkRange : halfCatcherWidth / 2);
             metadata.DistanceToHyper = (int) (metadata.TimeToNext - metadata.HyperDistanceToNext);
-            metadata.DistanceToDash = (int) (metadata.TimeToNext - metadata.DashDistanceToNext - (metadata.TimeToNext * 0.3));
+            // Greaper's : metadata.DistanceToDash = (int) (metadata.TimeToNext - metadata.DashDistanceToNext - (metadata.TimeToNext * 0.3));
+            // Basically full walk - 30 counts as a dash according to data from salad diffs
+            metadata.DistanceToDash = (int)(metadata.TimeToNext - metadata.DashDistanceToNext - (metadata.TimeToNext * 0.50) + 30);
 
             // Label the type of movement based on if the distance is dashable or walkable
             if (metadata.DistanceToHyper < 0) {

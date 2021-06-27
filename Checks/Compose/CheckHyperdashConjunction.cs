@@ -108,7 +108,7 @@ namespace MapsetChecksCatch.Checks.Compose
                             markedInsane = true;
                         }
                     }
-                    else if(currentObject.DistanceToDash <= 0.15 * (currentObject.Target.time - currentObject.time)){
+                    else if(currentObject.DistanceToDash <= (currentObject.Target.time - currentObject.time) / 15.0f){
                         if (IsHigherSnapped(Beatmap.Difficulty.Hard, currentObject, lastObject)){
                             yield return new Issue(
                                 GetTemplate("ConsecutiveHigherSnapPlatterWarning"),
@@ -145,7 +145,7 @@ namespace MapsetChecksCatch.Checks.Compose
                             ).ForDifficulties(Beatmap.Difficulty.Insane);
                         }
                     }
-                    else if(lastObject.DistanceToDash <= 0.15 * (lastObject.Target.time - lastObject.time)){
+                    else if(lastObject.DistanceToDash <= (lastObject.Target.time - lastObject.time) / 15.0f){
                         if (IsHigherSnapped(Beatmap.Difficulty.Hard, currentObject.Target, currentObject) && !markedHard){
                             yield return new Issue(
                                 GetTemplate("ConsecutiveHigherSnapPlatterWarning"),

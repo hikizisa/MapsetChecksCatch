@@ -15,6 +15,7 @@ namespace MapsetChecksCatch.Helper
         public float X;
         public int DistanceToHyperDash { get; set; }
         public int DistanceToDash { get; set; }
+        public float DistanceInOsuCords { get; set; }
         public CatchHitObject Target { get; set; }
         public CatchHitObject Origin { get; set; }
         public List<CatchHitObject> Extras { get; set; } = new List<CatchHitObject>();
